@@ -7,12 +7,13 @@ const port = 3000;
 const request = require('request');
 const querystring = require('querystring');
 const fetch = require("node-fetch");
+const { connect } = require('http2');
 
 app.use(express.static(__dirname + "/views"));
 app.use(express.urlencoded({ extended: true}));
 const wss = new WebSocket.Server({ server:server });
 
-let servers = ["192.168.0.16", "Banana"];
+let servers = ["192.168.0.16", "192.168.0.13"];
 
 wss.on('connection', function connection(ws) {
     console.log('A new client Connected!');
@@ -61,11 +62,38 @@ function horaActual(valor1,valor2){
  * Opcion hecha solamente para el usuario
  */
 app.get('/sincronizar', (req, res) => {
-    enviarHoraALaIp("localhost" , "3001");
+    obtenerHoraApi();
     res.send('Sincronizandoo!');
 });
 
-function enviarHoraALaIp(ip , puerto){
+function promedio(horaApi){
+    horaApi.split(":");
+    var fecha = new Date();
+    var horaAc = fecha.getHours();
+    var minutosAc = fecha.getMinutes();
+    var segAc = fecha.getSeconds();
+    var promHora = horaApi[0] - horaAc;
+    var promMin = horaApi[1] - minutosAc;
+    var promSeg = horaApi[2] - segAc;
+    servers.forEach(function(elemento) {
+        var actual = enviarHoraPorIP(elemento , 3001, '/sincronizar' , horaApi);
+        if(actual != "-1"){
+            hms = actual.split(":");
+            promHora += horaApi[0] - hms[0];
+            promMin += horaApi[1] - hms[1];
+            promSeg += horaApi[2] - hms[2];
+        }
+    });
+    console.log("Promedio de desfase de hora: " + promHora + " min: " + promMin + " seg " + promSeg);
+}
+
+/**
+ * Obtiene primero los datos de la hora actual y luego
+ * llama al metodo berkely
+ * @param {*} ip 
+ * @param {*} puerto 
+ */
+function obtenerHoraApi(ip , puerto){
     var promesa = new Promise((resolver, rechazar) => {
         console.log('Inicial');
         fetch('http://worldtimeapi.org/api/timezone/America/Bogota')
@@ -78,17 +106,18 @@ function enviarHoraALaIp(ip , puerto){
     });
     promesa.then(result =>{
         console.log("Se obtuvo la hora de la API: " + result);
-        enviarHoraPorIP(ip , puerto, result);
-    }).catch(() => {
-        console.log('No se puedo obtener hora de la API');
+        promedio(result);
+    });
+    promesa.catch(rechazar => {
+        console.log("Se rechazo la promesa, No se puedo obtener hora de la API: " + rechazar);
     });
 }
 
 /**
- * Usa la iip por parametro para heacer una peticion
+ * Usa la ip por parametro para heacer una peticion
  */
 
-function enviarHoraPorIP(ip , puerto , hora){
+function enviarHoraPorIP(ip , puerto , path, hora){
     var horaMinSeg = hora.split(':');
     var data = querystring.stringify({
         'Hora' : horaMinSeg[0],
@@ -99,39 +128,33 @@ function enviarHoraPorIP(ip , puerto , hora){
     var post_options = {
         host: ip,
         port: puerto,
-        path: '/sincronizar',
+        path: path,
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Content-Length': Buffer.byteLength(data)
-    }
-};
-
-// Set up the request
-var post_req = http.request(post_options, function(res) {
-    res.setEncoding('utf8');
-    res.on('data', function (chunk) {
-        console.log('Response: ' + chunk);
+        }
+    };
+    //Abro la coneccion
+    var post_req = http.request(post_options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('Response: ' + chunk);
+            return chunk + "";
+        });
     });
-});
-
-// post the data
-post_req.write(data);
-post_req.end();
+    //En caso de error
+    post_req.on('error', function(error) {
+        console.log("No se pudo conectar con: " + ip + " puerto: " + puerto);
+        //Elimino la ip de la lista de servidores
+        servers.splice(servers.indexOf(ip),1);  
+        return "-1";
+    });
+    //Envio los datos
+    post_req.write(data);
+    post_req.end();
 }
   
-
-
-/**
- * Suma uno a la variable number
- */
- function sum(){
-    number++
-    if(number >= servers.length){
-      number = 0;
-    }
-  }
-
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
