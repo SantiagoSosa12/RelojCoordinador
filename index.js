@@ -91,7 +91,7 @@ async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
         promHora += parseInt(hms[0]);
         promMin += parseInt(hms[1]);
         promSeg += parseInt(hms[2]);
-        console.log('desfase: ' + i +1 + ' ' + desfases[i+1]);
+        console.log('desfase: ' + i + 1 + '  :>> ' + desfases[i+1]);
     }
     promHora = promHora / servers.length;
     promMin = promMin / servers.length;
