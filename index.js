@@ -107,8 +107,10 @@ async function cambiarEnTodosLosServidores(promedioHora){
     for (let i = 0; i < servers.length; i++) {
         //Aqui se podria mostrar en pantalla lo que se hizo
         var des = desfases[ i + 1].split(":");
-        await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', + promedio[0] - des[0] + ':' 
-        + promedio[1] - des[1] + ':' + promedio[1] - des[1]);
+        await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', 
+        + (parseInt(promedio[0]) - parseInt(des[0])) + ':' 
+        + (parseInt(promedio[1]) - parseInt(des[1])) + ':' 
+        + (parseInt(promedio[1]) - parseInt(des[1])) );
         console.log('Cambiando hora en todos los servidores');
     }
 }
@@ -116,7 +118,9 @@ async function cambiarEnTodosLosServidores(promedioHora){
 function cambiaAqui(promedio){
     var des = desfases[0].split(":");
     var childProcess = exec('sh /home/serverone/RelojCoordinador/Shell/cambiarHora.sh '
-        + promedio[0] - des[0] + ':' + promedio[1] - des[1] + ':' + promedio[1] - des[1]);
+        + (parseInt(promedio[0]) - parseInt(des[0])) 
+        + ':' + (parseInt(promedio[1]) - parseInt(des[1])) 
+        + ':' + (parseInt(promedio[1]) - parseInt(des[1])));
     childProcess.stderr.on('data', data => console.error(data));
     childProcess.stdout.on('data', data => console.log(data));
 }
