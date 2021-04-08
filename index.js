@@ -75,16 +75,29 @@ function promedio(horaApi){
     var promHora = horaApi[0] - horaAc;
     var promMin = horaApi[1] - minutosAc;
     var promSeg = horaApi[2] - segAc;
-    //servers.forEach(function(elemento) {
-        //var PromesaActual = enviarHoraPorIP(elemento , 3001, '/sincronizar' , horaApi);
-        //PromesaActual.then(result => {
-            //hms = result.split(':');
-            //promHora += horaApi[0] - hms[0];
-            //promMin += horaApi[1] - hms[1];
-            //promSeg += horaApi[2] - hms[2];
-        //});
-    //});
-    console.log("Promedio de desfase de hora: " + promHora + " min: " + promMin + " seg " + promSeg);
+    var promedioOtrosServidores = promedioAllServers(promHora , promMin , promSeg , horaApi);
+    promedioOtrosServidores.then(result => {
+        console.log("Promedio de desfase de hora: " + result);    
+    });
+}
+
+function promedioAllServers(promHora , promMin , promSeg , horaApi){
+    return new Promise((resolver , rechazar) => {
+        servers.forEach(function(elemento) {
+            var PromesaActual = enviarHoraPorIP(elemento , 3001, '/sincronizar' , horaApi);
+            PromesaActual.then(result => {
+                hms = result.split(':');
+                promHora += horaApi[0] - hms[0];
+                promMin += horaApi[1] - hms[1];
+                promSeg += horaApi[2] - hms[2];
+            });
+        });
+        promHora = promHora / servers.length;
+        promMin = promMin / servers.length;
+        promSeg = promSeg / servers.length;
+        resolver(promHora + ":" + promMin + ":" + promSeg);
+        rechazar("00:00:00");
+    });
 }
 
 /**
