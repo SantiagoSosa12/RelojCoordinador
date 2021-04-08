@@ -93,13 +93,18 @@ async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     promHora = promHora / servers.length;
     promMin = promMin / servers.length;
     promSeg = promSeg / servers.length;
-    console.log("La promesa esta lista con: " + promHora + ":" + promMin + ":" + promSeg)
+    promedioTotal = promHora + ":" + promMin + ":" + promSeg;
+    console.log("La promesa esta lista con: " + promedioTotal);
+    cambiarEnTodosLosServidores(promedioTotal);
 }
 
-//async function redondear(promHora, promMin, promSeg, horaApi) {
-//    var promedioOtrosServidores = await promedioAllServers(promHora, promMin, promSeg, horaApi);
-//    console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
-//}
+async function cambiarEnTodosLosServidores(promedioHora){
+    promedioHora = promedioHora.split(':');
+    for (let i = 0; i < servers.length; i++) {
+        //Aqui se podria mostrar en pantalla lo que se hizo
+        await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', promedioHora);
+    }
+}
 
 /**
  * Obtiene primero los datos de la hora actual y luego
@@ -127,8 +132,8 @@ function obtenerHoraApi() {
 
 /**
  * Usa la ip por parametro para heacer una peticion
+ * Se usa para obtener los desfases y cambiar la hora
  */
-
 function enviarHoraPorIP(ip, puerto, path, hora) {
     return new Promise((resolver, rechazar) => {
         var data = querystring.stringify({
