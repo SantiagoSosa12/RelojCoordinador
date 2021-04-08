@@ -95,11 +95,12 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
         p.catch(rechazar => {
             console.log('Error al conectar a la ip: ' + elemento);
         });
+        promHora = promHora / servers.length;
+        promMin = promMin / servers.length;
+        promSeg = promSeg / servers.length;
+        return promHora + ":" + promMin + ":" + promSeg;
     }
-    promHora = promHora / servers.length;
-    promMin = promMin / servers.length;
-    promSeg = promSeg / servers.length;
-    return promHora + ":" + promMin + ":" + promSeg;
+    return "-1:-1:-1";
 }
 
 /**
