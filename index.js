@@ -10,8 +10,8 @@ const fetch = require("node-fetch");
 const { connect } = require('http2');
 
 app.use(express.static(__dirname + "/views"));
-app.use(express.urlencoded({ extended: true}));
-const wss = new WebSocket.Server({ server:server });
+app.use(express.urlencoded({ extended: true }));
+const wss = new WebSocket.Server({ server: server });
 
 let servers = ["192.168.0.16", "192.168.0.13"];
 
@@ -28,8 +28,8 @@ app.post('/cambiarHora', (req, res) => {
     console.log(req.body.hora);
     console.log(req.body.minuto);
     console.log(req.body.segundo);
-    var childProcess = exec('sh /home/serverone/RelojMiddleware/Shell/cambiarHora.sh ' 
-    + req.body.hora + ':' + req.body.minuto + ':' + req.body.segundo);
+    var childProcess = exec('sh /home/serverone/RelojMiddleware/Shell/cambiarHora.sh '
+        + req.body.hora + ':' + req.body.minuto + ':' + req.body.segundo);
     childProcess.stderr.on('data', data => console.error(data));
     childProcess.stdout.on('data', data => console.log(data));
     res.send('Se cambio la hora');
@@ -39,23 +39,23 @@ app.post('/cambiarHora', (req, res) => {
  * Envia la hora a cada uno de los clientes conectados
  * @param {*} ws 
  */
-function enviarHora(ws){
+function enviarHora(ws) {
     wss.clients.forEach(function each(client) {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(horaActual());
         }
     });
-    setTimeout(function(){
+    setTimeout(function () {
         enviarHora(ws);
-    } , 500);
+    }, 500);
 }
 
-function horaActual(valor1,valor2){ 
+function horaActual(valor1, valor2) {
     var fecha = new Date();
     var hora = fecha.getHours();
     var minutos = fecha.getMinutes();
     var seg = fecha.getSeconds();
-    return hora + " : " + minutos + " : " + seg; 
+    return hora + " : " + minutos + " : " + seg;
 }
 
 /**
@@ -66,7 +66,7 @@ app.get('/sincronizar', (req, res) => {
     res.send('Sincronizandoo!');
 });
 
-function promedio(horaApi){
+function promedio(horaApi) {
     horaApi = horaApi.split(':');
     var fecha = new Date();
     var horaAc = fecha.getHours();
@@ -75,53 +75,45 @@ function promedio(horaApi){
     var promHora = horaApi[0] - horaAc;
     var promMin = horaApi[1] - minutosAc;
     var promSeg = horaApi[2] - segAc;
-    var promedioOtrosServidores = promedioAllServers(promHora , promMin , promSeg , horaApi);
-    promedioOtrosServidores.then(result => {
-        console.log("Promedio de desfase de hora: " + result);    
-    });
-    promedioOtrosServidores.catch(rechazar => {
-        console.log('Promesa promedio rechazada: ' + rechazar);
-    });
+    var promedioOtrosServidores = promedioAllServers(promHora, promMin, promSeg, horaApi);
+    console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
 
-function promedioAllServers(promHora , promMin , promSeg , horaApi){
-    return new Promise((resolver , rechazar) => {
-        servers.forEach(function(elemento) {
-            var PromesaActual = enviarHoraPorIP(elemento , 3001, '/sincronizar' , horaApi);
-            PromesaActual.then(result => {
-                hms = result.split(':');
-                promHora += horaApi[0] - hms[0];
-                promMin += horaApi[1] - hms[1];
-                promSeg += horaApi[2] - hms[2];
-            });
-            PromesaActual.catch(rechazar => {
-                console.log('Error al conectar a la ip: ' + elemento);
-            });
+function promedioAllServers(promHora, promMin, promSeg, horaApi) {
+    servers.forEach(function (elemento) {
+        var PromesaActual = await enviarHoraPorIP(elemento, 3001, '/sincronizar', horaApi);
+        PromesaActual.then(result => {
+            hms = result.split(':');
+            promHora += horaApi[0] - hms[0];
+            promMin += horaApi[1] - hms[1];
+            promSeg += horaApi[2] - hms[2];
         });
-        promHora = promHora / servers.length;
-        promMin = promMin / servers.length;
-        promSeg = promSeg / servers.length;
-        resolver(promHora + ":" + promMin + ":" + promSeg);
-        rechazar("00:00:00");
+        PromesaActual.catch(rechazar => {
+            console.log('Error al conectar a la ip: ' + elemento);
+        });
     });
+    promHora = promHora / servers.length;
+    promMin = promMin / servers.length;
+    promSeg = promSeg / servers.length;
+    return promHora + ":" + promMin + ":" + promSeg);
 }
 
 /**
  * Obtiene primero los datos de la hora actual y luego
  * llama al metodo berkely
  */
-function obtenerHoraApi(){
+function obtenerHoraApi() {
     var promesa = new Promise((resolver, rechazar) => {
         console.log('Inicial');
         fetch('http://worldtimeapi.org/api/timezone/America/Bogota')
-        .then(function(response) {
-            return response.json(); // converts response to json
-        })
-        .then(function(data) {
-            resolver(data["datetime"].substr(11 , 8));
-        });
+            .then(function (response) {
+                return response.json(); // converts response to json
+            })
+            .then(function (data) {
+                resolver(data["datetime"].substr(11, 8));
+            });
     });
-    promesa.then(result =>{
+    promesa.then(result => {
         console.log("Se obtuvo la hora de la API: " + result);
         promedio(result);
     });
@@ -134,12 +126,12 @@ function obtenerHoraApi(){
  * Usa la ip por parametro para heacer una peticion
  */
 
-function enviarHoraPorIP(ip , puerto , path, hora){
-    hora = hora + '';
+function enviarHoraPorIP(ip, puerto, path, hora) {
     return new Promise((resolver, rechazar) => {
+        hora = hora + '';
         var horaMinSeg = hora.split(':');
         var data = querystring.stringify({
-            'Hora' : horaMinSeg[0],
+            'Hora': horaMinSeg[0],
             'Minuto': horaMinSeg[1],
             'Segundo': horaMinSeg[2]
         });
@@ -153,9 +145,9 @@ function enviarHoraPorIP(ip , puerto , path, hora){
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Content-Length': Buffer.byteLength(data)
             }
-         };
+        };
         //Abro la coneccion
-        var post_req = http.request(post_options, function(res) {
+        var post_req = http.request(post_options, function (res) {
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
                 console.log('Response: ' + chunk);
@@ -163,10 +155,10 @@ function enviarHoraPorIP(ip , puerto , path, hora){
             });
         });
         //En caso de error
-        post_req.on('error', function(error) {
+        post_req.on('error', function (error) {
             console.log("No se pudo conectar con: " + ip + " puerto: " + puerto);
             //Elimino la ip de la lista de servidores
-            servers.splice(servers.indexOf(ip),1);  
+            servers.splice(servers.indexOf(ip), 1);
             rechazar("No se pudo conectar con: " + ip + " puerto: " + puerto);
         });
         //Envio los datos
@@ -174,7 +166,7 @@ function enviarHoraPorIP(ip , puerto , path, hora){
         post_req.end();
     });
 }
-  
+
 app.get('/', (req, res) => res.send('Hello World!'));
 
 server.listen(port, () => {
