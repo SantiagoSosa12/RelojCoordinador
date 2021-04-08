@@ -109,7 +109,7 @@ async function cambiarEnTodosLosServidores(promedioHora){
         var des = desfases[ i + 1].split(":");
         var toSend = [(parseInt(promedio[0]) - parseInt(des[0])) 
         , (parseInt(promedio[1]) - parseInt(des[1])) 
-        , (parseInt(promedio[1]) - parseInt(des[1])) ];     
+        , (parseInt(promedio[2]) - parseInt(des[2])) ];     
         await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', toSend);
         console.log('Cambiando hora en todos los servidores');
     }
@@ -121,7 +121,7 @@ function cambiaAqui(promedio){
     var childProcess = exec('sh /home/serverone/RelojCoordinador/Shell/cambiarHora.sh '
         + (parseInt(promedio[0]) - parseInt(des[0]) + fecha.getHours()) 
         + ':' + (parseInt(promedio[1]) - parseInt(des[1]) + fecha.getMinutes()) 
-        + ':' + (parseInt(promedio[1]) - parseInt(des[1])) + fecha.getSeconds() );
+        + ':' + (parseInt(promedio[2]) - parseInt(des[2])) + fecha.getSeconds() );
     childProcess.stderr.on('data', data => console.error(data));
     childProcess.stdout.on('data', data => console.log(data));
 }
@@ -155,6 +155,7 @@ function obtenerHoraApi() {
  * Se usa para obtener los desfases y cambiar la hora
  */
 function enviarHoraPorIP(ip, puerto, path, hora) {
+    console.log("La hora que entra es: " + hora[0] + ":" + hora[1] + ":"+hora[2]);
     return new Promise((resolver, rechazar) => {
         var data = querystring.stringify({
             'Hora': hora[0],
