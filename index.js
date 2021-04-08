@@ -105,10 +105,10 @@ async function cambiarEnTodosLosServidores(promedioHora){
     for (let i = 0; i < servers.length; i++) {
         //Aqui se podria mostrar en pantalla lo que se hizo
         var des = desfases[ i + 1].split(":");
-        var toSend = [(parseInt(promedio[0]) - parseInt(des[0])) 
-        , (parseInt(promedio[1]) - parseInt(des[1])) 
-        , (parseInt(promedio[2]) - parseInt(des[2])) ];     
-        console.log('Promedio menos desfase es igual a: ' + (parseInt(promedio[0]) - parseInt(des[0])) );
+        var toSend = [(parseInt(promedioHora[0]) - parseInt(des[0])) 
+        , (parseInt(promedioHora[1]) - parseInt(des[1])) 
+        , (parseInt(promedioHora[2]) - parseInt(des[2])) ];     
+        console.log('Promedio menos desfase es igual a: ' + (parseInt(promedioHora[0]) - parseInt(des[0])) );
         await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', toSend);
         console.log("La hora que SALE es: " + toSend[0] + ":" + toSend[1] + ":"+ toSend[2]);
         console.log('Cambiando hora en todos los servidores');
