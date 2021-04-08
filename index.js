@@ -91,7 +91,6 @@ async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
         promHora += parseInt(hms[0]);
         promMin += parseInt(hms[1]);
         promSeg += parseInt(hms[2]);
-        console.log('desfase: ' + i + 1 + '  :>> ' + desfases[i+1]);
     }
     promHora = promHora / servers.length;
     promMin = promMin / servers.length;
@@ -109,6 +108,7 @@ async function cambiarEnTodosLosServidores(promedioHora){
         var toSend = [(parseInt(promedio[0]) - parseInt(des[0])) 
         , (parseInt(promedio[1]) - parseInt(des[1])) 
         , (parseInt(promedio[2]) - parseInt(des[2])) ];     
+        console.log('Promedio menos desfase es igual a: ' + (parseInt(promedio[0]) - parseInt(des[0])) );
         await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', toSend);
         console.log("La hora que SALE es: " + toSend[0] + ":" + toSend[1] + ":"+ toSend[2]);
         console.log('Cambiando hora en todos los servidores');
