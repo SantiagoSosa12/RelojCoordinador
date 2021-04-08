@@ -103,6 +103,7 @@ async function cambiarEnTodosLosServidores(promedioHora){
     for (let i = 0; i < servers.length; i++) {
         //Aqui se podria mostrar en pantalla lo que se hizo
         await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', promedioHora);
+        console.log('Cambiando hora en todos los servidores');
     }
 }
 
