@@ -80,6 +80,7 @@ function promedio(horaApi) {
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
     desfases[0] = promHora + ":" + promMin + ":" + promSeg;
+    console.log(promHora + ":" + promMin + ":" + promSeg + " Promedio inicial de esta maquina");
     promedioAllServers(promHora, promMin, promSeg, horaApi);
 }
 
@@ -111,6 +112,7 @@ async function cambiarEnTodosLosServidores(promedioHora){
         , (parseInt(promedio[1]) - parseInt(des[1])) 
         , (parseInt(promedio[2]) - parseInt(des[2])) ];     
         await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', toSend);
+        console.log("La hora que SALE es: " + toSend[0] + ":" + toSend[1] + ":"+ toSend[2]);
         console.log('Cambiando hora en todos los servidores');
     }
 }
@@ -155,7 +157,7 @@ function obtenerHoraApi() {
  * Se usa para obtener los desfases y cambiar la hora
  */
 function enviarHoraPorIP(ip, puerto, path, hora) {
-    console.log("La hora que entra es: " + hora[0] + ":" + hora[1] + ":"+hora[2]);
+    
     return new Promise((resolver, rechazar) => {
         var data = querystring.stringify({
             'Hora': hora[0],
