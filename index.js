@@ -78,13 +78,7 @@ function promedio(horaApi) {
     var promHora = parseInt(horaApi[0] - horaAc);
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
-    var promedioOtrosServidores = promedioAllServers(promHora, promMin, promSeg, horaApi);
-    promedioOtrosServidores.then(result => {
-        console.log("Promedio de desfase de hora: " + result);
-    });
-    promedioOtrosServidores.catch(rechazar => {
-        console.log(rechazar);
-    });
+    redondear(promHora, promMin, promSeg, horaApi);
     
 }
 
@@ -108,6 +102,16 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
             promSeg = promSeg / servers.length;
             resolver(promHora + ":" + promMin + ":" + promSeg);
         }
+    });
+}
+
+async function redondear(promHora, promMin, promSeg, horaApi){
+    var promedioOtrosServidores = await promedioAllServers(promHora, promMin, promSeg, horaApi);
+    promedioOtrosServidores.then(result => {
+        console.log("Promedio de desfase de hora: " + result);
+    });
+    promedioOtrosServidores.catch(rechazar => {
+        console.log(rechazar);
     });
 }
 
