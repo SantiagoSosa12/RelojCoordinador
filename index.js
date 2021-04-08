@@ -135,6 +135,7 @@ function obtenerHoraApi(){
  */
 
 function enviarHoraPorIP(ip , puerto , path, hora){
+    hora = hora + '';
     return new Promise((resolver, rechazar) => {
         var horaMinSeg = hora.split(':');
         var data = querystring.stringify({
