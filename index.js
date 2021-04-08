@@ -86,7 +86,7 @@ function promedio(horaApi) {
 async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     for (let i = 0; i < servers.length; i++) {
         var current = await enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
-        desfases[i + 1] = current;
+        desfases[i + 1] = ""+current;
         hms = current.split(':');
         promHora += parseInt(hms[0]);
         promMin += parseInt(hms[1]);
