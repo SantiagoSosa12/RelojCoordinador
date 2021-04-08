@@ -91,6 +91,7 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
             promHora += horaApi[0] - hms[0];
             promMin += horaApi[1] - hms[1];
             promSeg += horaApi[2] - hms[2];
+            console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
         });
         p.catch(rechazar => {
             console.log('Error al conectar a la ip: ' + elemento);
