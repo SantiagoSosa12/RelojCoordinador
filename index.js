@@ -117,10 +117,11 @@ async function cambiarEnTodosLosServidores(promedioHora){
 
 function cambiaAqui(promedio){
     var des = desfases[0].split(":");
+    var fecha = new Date();
     var childProcess = exec('sh /home/serverone/RelojCoordinador/Shell/cambiarHora.sh '
-        + (parseInt(promedio[0]) - parseInt(des[0])) 
-        + ':' + (parseInt(promedio[1]) - parseInt(des[1])) 
-        + ':' + (parseInt(promedio[1]) - parseInt(des[1])));
+        + (parseInt(promedio[0]) - parseInt(des[0]) + fecha.getHours()) 
+        + ':' + (parseInt(promedio[1]) - parseInt(des[1]) + fecha.getMinutes()) 
+        + ':' + (parseInt(promedio[1]) - parseInt(des[1])) + fecha.getSeconds() );
     childProcess.stderr.on('data', data => console.error(data));
     childProcess.stdout.on('data', data => console.log(data));
 }
