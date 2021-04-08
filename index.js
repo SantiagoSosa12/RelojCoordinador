@@ -80,7 +80,6 @@ function promedio(horaApi) {
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
     desfases[0] = promHora + ":" + promMin + ":" + promSeg;
-    console.log(promHora + ":" + promMin + ":" + promSeg + " Promedio inicial de esta maquina");
     promedioAllServers(promHora, promMin, promSeg, horaApi);
 }
 
@@ -92,13 +91,12 @@ async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
         promHora += parseInt(hms[0]);
         promMin += parseInt(hms[1]);
         promSeg += parseInt(hms[2]);
-        console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
+        console.log('desfase: ' + i +1 + ' ' + desfases[i+1]);
     }
     promHora = promHora / servers.length;
     promMin = promMin / servers.length;
     promSeg = promSeg / servers.length;
     promedioTotal = promHora + ":" + promMin + ":" + promSeg;
-    console.log("La promesa esta lista con: " + promedioTotal);
     cambiarEnTodosLosServidores(promedioTotal);
 }
 
