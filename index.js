@@ -17,7 +17,7 @@ app.use(express.urlencoded({
 const wss = new WebSocket.Server({ server: server });
 
 var servers = ["192.168.0.16", "192.168.0.13"];
-var desfases = ["","" ,""];
+var desfases = [];
 
 wss.on('connection', function connection(ws) {
     console.log('A new client Connected!');
@@ -79,14 +79,14 @@ function promedio(horaApi) {
     var promHora = parseInt(horaApi[0] - horaAc);
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
-    desfases[0] = promHora + ":" + promMin + ":" + promSeg;
+    desfases.push(promHora + ":" + promMin + ":" + promSeg);
     promedioAllServers(promHora, promMin, promSeg, horaApi);
 }
 
 async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     for (let i = 0; i < servers.length; i++) {
         var current = await enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
-        desfases[i + 1] = ""+current;
+        desfases.push(current);
         hms = current.split(':');
         promHora += parseInt(hms[0]);
         promMin += parseInt(hms[1]);
