@@ -96,7 +96,7 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     promHora = promHora / servers.length;
     promMin = promMin / servers.length;
     promSeg = promSeg / servers.length;
-    return promHora + ":" + promMin + ":" + promSeg);
+    return promHora + ":" + promMin + ":" + promSeg;
 }
 
 /**
