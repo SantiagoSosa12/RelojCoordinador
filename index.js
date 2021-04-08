@@ -82,7 +82,7 @@ function promedio(horaApi) {
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
 
-function promedioAllServers(promHora, promMin, promSeg) {
+function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     for(let i =0 , p = Promise.resolve(); i < servers.length; i++){
         p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
         p.then(result => {
