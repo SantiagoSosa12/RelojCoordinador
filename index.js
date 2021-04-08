@@ -16,8 +16,8 @@ app.use(express.urlencoded({
 }));
 const wss = new WebSocket.Server({ server: server });
 
-let servers = ["192.168.0.16", "192.168.0.13"];
-let desfases = ["","" ,""];
+var servers = ["192.168.0.16", "192.168.0.13"];
+var desfases = ["","" ,""];
 
 wss.on('connection', function connection(ws) {
     console.log('A new client Connected!');
