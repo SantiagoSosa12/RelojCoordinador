@@ -17,6 +17,7 @@ app.use(express.urlencoded({
 const wss = new WebSocket.Server({ server: server });
 
 let servers = ["192.168.0.16", "192.168.0.13"];
+let desfases = ["","" ,""];
 
 wss.on('connection', function connection(ws) {
     console.log('A new client Connected!');
@@ -78,12 +79,14 @@ function promedio(horaApi) {
     var promHora = parseInt(horaApi[0] - horaAc);
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
+    desfases[0] = promHora + ":" + promMin + ":" + promSeg;
     promedioAllServers(promHora, promMin, promSeg, horaApi);
 }
 
 async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     for (let i = 0; i < servers.length; i++) {
         var current = await enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
+        desfases[i + 1] = current;
         hms = current.split(':');
         promHora += parseInt(hms[0]);
         promMin += parseInt(hms[1]);
@@ -100,11 +103,22 @@ async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
 
 async function cambiarEnTodosLosServidores(promedioHora){
     promedioHora = promedioHora.split(':');
+    cambiaAqui(promedioHora);
     for (let i = 0; i < servers.length; i++) {
         //Aqui se podria mostrar en pantalla lo que se hizo
-        await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', promedioHora);
+        var des = desfases[ i + 1].split(":");
+        await enviarHoraPorIP(servers[i], 3001, '/cambiarHoraDesfase', + promedio[0] - des[0] + ':' 
+        + promedio[1] - des[1] + ':' + promedio[1] - des[1]);
         console.log('Cambiando hora en todos los servidores');
     }
+}
+
+function cambiaAqui(promedio){
+    var des = desfases[0].split(":");
+    var childProcess = exec('sh /home/serverone/RelojMiddleware/Shell/cambiarHora.sh '
+        + promedio[0] - des[0] + ':' + promedio[1] - des[1] + ':' + promedio[1] - des[1]);
+    childProcess.stderr.on('data', data => console.error(data));
+    childProcess.stdout.on('data', data => console.log(data));
 }
 
 /**
