@@ -107,12 +107,7 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
 
 async function redondear(promHora, promMin, promSeg, horaApi){
     var promedioOtrosServidores = await promedioAllServers(promHora, promMin, promSeg, horaApi);
-    promedioOtrosServidores.then(result => {
-        console.log("Promedio de desfase de hora: " + result);
-    });
-    promedioOtrosServidores.catch(rechazar => {
-        console.log(rechazar);
-    });
+    console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
 
 /**
