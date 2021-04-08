@@ -70,20 +70,19 @@ app.get('/sincronizar', (req, res) => {
 });
 
 function promedio(horaApi) {
-    horaApi2 = horaApi.split(':');
+    horaApi = horaApi.split(':');
     var fecha = new Date();
     var horaAc = fecha.getHours();
     var minutosAc = fecha.getMinutes();
     var segAc = fecha.getSeconds();
-    var promHora = horaApi2[0] - horaAc;
-    var promMin = horaApi2[1] - minutosAc;
-    var promSeg = horaApi2[2] - segAc;
+    var promHora = horaApi[0] - horaAc;
+    var promMin = horaApi[1] - minutosAc;
+    var promSeg = horaApi[2] - segAc;
     var promedioOtrosServidores = promedioAllServers(promHora, promMin, promSeg, horaApi);
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
 
 function promedioAllServers(promHora, promMin, promSeg, horaApi) {
-    
     for(let i =0 , p = Promise.resolve(); i < servers.length; i++){
         p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
         p.then(result => {
@@ -133,12 +132,10 @@ function obtenerHoraApi() {
 
 function enviarHoraPorIP(ip, puerto, path, hora) {
     return new Promise((resolver, rechazar) => {
-        hora = hora + '';
-        var horaMinSeg = hora.split(':');
         var data = querystring.stringify({
-            'Hora': horaMinSeg[0],
-            'Minuto': horaMinSeg[1],
-            'Segundo': horaMinSeg[2]
+            'Hora': hora[0],
+            'Minuto': hora[1],
+            'Segundo': hora[2]
         });
         var http = require('http');
         var post_options = {
