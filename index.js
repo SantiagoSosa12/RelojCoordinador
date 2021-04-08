@@ -67,7 +67,7 @@ app.get('/sincronizar', (req, res) => {
 });
 
 function promedio(horaApi){
-    horaApi.split(':');
+    horaApi = horaApi.split(':');
     var fecha = new Date();
     var horaAc = fecha.getHours();
     var minutosAc = fecha.getMinutes();
