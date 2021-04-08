@@ -78,13 +78,12 @@ function promedio(horaApi) {
     var promHora = parseInt(horaApi[0] - horaAc);
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
-    redondear(promHora, promMin, promSeg, horaApi);
-
+    promedioAllServers(promHora, promMin, promSeg, horaApi);
 }
 
-function promedioAllServers(promHora, promMin, promSeg, horaApi) {
+async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
     for (let i = 0, p = Promise.resolve(); i < servers.length; i++) {
-        p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
+        p = await enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
         p.then(result => {
             hms = result.split(':');
             promHora += parseInt(hms[0]);
@@ -96,18 +95,17 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
             console.log('Error al conectar a la ip: ' + elemento);
             rechazar('Error al conectar a la ip: ' + elemento);
         });
-        promHora = promHora / servers.length;
-        promMin = promMin / servers.length;
-        promSeg = promSeg / servers.length;
-        console.log("La promesa esta lista con: " + promHora + ":" + promMin + ":" + promSeg)
     }
-
+    promHora = promHora / servers.length;
+    promMin = promMin / servers.length;
+    promSeg = promSeg / servers.length;
+    console.log("La promesa esta lista con: " + promHora + ":" + promMin + ":" + promSeg)
 }
 
-async function redondear(promHora, promMin, promSeg, horaApi) {
-    var promedioOtrosServidores = await promedioAllServers(promHora, promMin, promSeg, horaApi);
-    console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
-}
+//async function redondear(promHora, promMin, promSeg, horaApi) {
+//    var promedioOtrosServidores = await promedioAllServers(promHora, promMin, promSeg, horaApi);
+//    console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
+//}
 
 /**
  * Obtiene primero los datos de la hora actual y luego
