@@ -75,9 +75,9 @@ function promedio(horaApi) {
     var horaAc = fecha.getHours();
     var minutosAc = fecha.getMinutes();
     var segAc = fecha.getSeconds();
-    var promHora = new Number(horaApi[0] - horaAc);
-    var promMin = new Number(horaApi[1] - minutosAc);
-    var promSeg = new Number(horaApi[2] - segAc);
+    var promHora = horaApi[0] - horaAc;
+    var promMin = horaApi[1] - minutosAc;
+    var promSeg = horaApi[2] - segAc;
     var promedioOtrosServidores = promedioAllServers(promHora, promMin, promSeg, horaApi);
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
@@ -87,9 +87,9 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
         p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
         p.then(result => {
             hms = result.split(':');
-            promHora += hms[0];
-            promMin += hms[1];
-            promSeg += hms[2];
+            promHora += new Number(hms[0]);
+            promMin += new Number(hms[1]);
+            promSeg += new Number(hms[2]);
             console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
         });
         p.catch(rechazar => {
