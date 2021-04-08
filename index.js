@@ -100,7 +100,6 @@ function promedioAllServers(promHora, promMin, promSeg, horaApi) {
         promMin = promMin / servers.length;
         promSeg = promSeg / servers.length;
         console.log("La promesa esta lista con: " + promHora + ":" + promMin + ":" + promSeg)
-        resolver(promHora + ":" + promMin + ":" + promSeg);
     }
 
 }
