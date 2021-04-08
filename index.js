@@ -12,7 +12,7 @@ const { connect } = require('http2');
 app.use(express.static(__dirname + "/views"));
 app.use(express.json());
 app.use(express.urlencoded({
-  extended: true
+    extended: true
 }));
 const wss = new WebSocket.Server({ server: server });
 
@@ -79,33 +79,33 @@ function promedio(horaApi) {
     var promMin = parseInt(horaApi[1] - minutosAc);
     var promSeg = parseInt(horaApi[2] - segAc);
     redondear(promHora, promMin, promSeg, horaApi);
-    
+
 }
 
 function promedioAllServers(promHora, promMin, promSeg, horaApi) {
-    return new Promise((resolver , rechazar) => {
-        for(let i =0 , p = Promise.resolve(); i < servers.length; i++){
-            p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
-            p.then(result => {
-                hms = result.split(':');
-                promHora += parseInt(hms[0]);
-                promMin += parseInt(hms[1]);
-                promSeg += parseInt(hms[2]);
-                console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
-            });
-            p.catch(rechazar => {
-                console.log('Error al conectar a la ip: ' + elemento);
-                rechazar('Error al conectar a la ip: ' + elemento);
-            });
-            promHora = promHora / servers.length;
-            promMin = promMin / servers.length;
-            promSeg = promSeg / servers.length;
-            resolver(promHora + ":" + promMin + ":" + promSeg);
-        }
-    });
+    for (let i = 0, p = Promise.resolve(); i < servers.length; i++) {
+        p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
+        p.then(result => {
+            hms = result.split(':');
+            promHora += parseInt(hms[0]);
+            promMin += parseInt(hms[1]);
+            promSeg += parseInt(hms[2]);
+            console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
+        });
+        p.catch(rechazar => {
+            console.log('Error al conectar a la ip: ' + elemento);
+            rechazar('Error al conectar a la ip: ' + elemento);
+        });
+        promHora = promHora / servers.length;
+        promMin = promMin / servers.length;
+        promSeg = promSeg / servers.length;
+        console.log("La promesa esta lista con: " + promHora + ":" + promMin + ":" + promSeg)
+        resolver(promHora + ":" + promMin + ":" + promSeg);
+    }
+
 }
 
-async function redondear(promHora, promMin, promSeg, horaApi){
+async function redondear(promHora, promMin, promSeg, horaApi) {
     var promedioOtrosServidores = await promedioAllServers(promHora, promMin, promSeg, horaApi);
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
