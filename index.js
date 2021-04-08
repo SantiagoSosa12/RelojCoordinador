@@ -10,7 +10,10 @@ const fetch = require("node-fetch");
 const { connect } = require('http2');
 
 app.use(express.static(__dirname + "/views"));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}));
 const wss = new WebSocket.Server({ server: server });
 
 let servers = ["192.168.0.16", "192.168.0.13"];
@@ -67,14 +70,14 @@ app.get('/sincronizar', (req, res) => {
 });
 
 function promedio(horaApi) {
-    horaApi = horaApi.split(':');
+    horaApi2 = horaApi.split(':');
     var fecha = new Date();
     var horaAc = fecha.getHours();
     var minutosAc = fecha.getMinutes();
     var segAc = fecha.getSeconds();
-    var promHora = horaApi[0] - horaAc;
-    var promMin = horaApi[1] - minutosAc;
-    var promSeg = horaApi[2] - segAc;
+    var promHora = horaApi2[0] - horaAc;
+    var promMin = horaApi2[1] - minutosAc;
+    var promSeg = horaApi2[2] - segAc;
     var promedioOtrosServidores = promedioAllServers(promHora, promMin, promSeg, horaApi);
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
