@@ -67,7 +67,7 @@ app.get('/sincronizar', (req, res) => {
 });
 
 function promedio(horaApi){
-    horaApi.split(":");
+    horaApi.split(':');
     var fecha = new Date();
     var horaAc = fecha.getHours();
     var minutosAc = fecha.getMinutes();
@@ -76,13 +76,13 @@ function promedio(horaApi){
     var promMin = horaApi[1] - minutosAc;
     var promSeg = horaApi[2] - segAc;
     servers.forEach(function(elemento) {
-        var actual = enviarHoraPorIP(elemento , 3001, '/sincronizar' , horaApi);
-        if(actual != "-1"){
-            hms = actual.split(":");
+        var PromesaActual = enviarHoraPorIP(elemento , 3001, '/sincronizar' , horaApi);
+        PromesaActual.then(result => {
+            hms = result.split(':');
             promHora += horaApi[0] - hms[0];
             promMin += horaApi[1] - hms[1];
             promSeg += horaApi[2] - hms[2];
-        }
+        });
     });
     console.log("Promedio de desfase de hora: " + promHora + " min: " + promMin + " seg " + promSeg);
 }
@@ -118,41 +118,43 @@ function obtenerHoraApi(ip , puerto){
  */
 
 function enviarHoraPorIP(ip , puerto , path, hora){
-    var horaMinSeg = hora.split(':');
-    var data = querystring.stringify({
-        'Hora' : horaMinSeg[0],
-        'Minuto': horaMinSeg[1],
-        'Segundo': horaMinSeg[2]
-    });
-    var http = require('http');
-    var post_options = {
-        host: ip,
-        port: puerto,
-        path: path,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(data)
-        }
-    };
-    //Abro la coneccion
-    var post_req = http.request(post_options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
-            return chunk + "";
+    return new Promise((resolver, rechazar) => {
+        var horaMinSeg = hora.split(':');
+        var data = querystring.stringify({
+            'Hora' : horaMinSeg[0],
+            'Minuto': horaMinSeg[1],
+            'Segundo': horaMinSeg[2]
         });
+        var http = require('http');
+        var post_options = {
+            host: ip,
+            port: puerto,
+            path: path,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(data)
+            }
+         };
+        //Abro la coneccion
+        var post_req = http.request(post_options, function(res) {
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                console.log('Response: ' + chunk);
+                resolver(chunk);
+            });
+        });
+        //En caso de error
+        post_req.on('error', function(error) {
+            console.log("No se pudo conectar con: " + ip + " puerto: " + puerto);
+            //Elimino la ip de la lista de servidores
+            servers.splice(servers.indexOf(ip),1);  
+            rechazar("No se pudo conectar con: " + ip + " puerto: " + puerto);
+        });
+        //Envio los datos
+        post_req.write(data);
+        post_req.end();
     });
-    //En caso de error
-    post_req.on('error', function(error) {
-        console.log("No se pudo conectar con: " + ip + " puerto: " + puerto);
-        //Elimino la ip de la lista de servidores
-        servers.splice(servers.indexOf(ip),1);  
-        return "-1";
-    });
-    //Envio los datos
-    post_req.write(data);
-    post_req.end();
 }
   
 
