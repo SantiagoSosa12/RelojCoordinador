@@ -82,19 +82,13 @@ function promedio(horaApi) {
 }
 
 async function promedioAllServers(promHora, promMin, promSeg, horaApi) {
-    for (let i = 0, p = Promise.resolve(); i < servers.length; i++) {
-        p = await enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
-        p.then(result => {
-            hms = result.split(':');
-            promHora += parseInt(hms[0]);
-            promMin += parseInt(hms[1]);
-            promSeg += parseInt(hms[2]);
-            console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
-        });
-        p.catch(rechazar => {
-            console.log('Error al conectar a la ip: ' + elemento);
-            rechazar('Error al conectar a la ip: ' + elemento);
-        });
+    for (let i = 0; i < servers.length; i++) {
+        var current = await enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
+        hms = current.split(':');
+        promHora += parseInt(hms[0]);
+        promMin += parseInt(hms[1]);
+        promSeg += parseInt(hms[2]);
+        console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
     }
     promHora = promHora / servers.length;
     promMin = promMin / servers.length;
