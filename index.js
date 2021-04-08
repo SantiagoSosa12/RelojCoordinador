@@ -79,6 +79,9 @@ function promedio(horaApi){
     promedioOtrosServidores.then(result => {
         console.log("Promedio de desfase de hora: " + result);    
     });
+    promedioOtrosServidores.catch(rechazar => {
+        console.log('Promesa promedio rechazada: ' + rechazar);
+    });
 }
 
 function promedioAllServers(promHora , promMin , promSeg , horaApi){
@@ -90,6 +93,9 @@ function promedioAllServers(promHora , promMin , promSeg , horaApi){
                 promHora += horaApi[0] - hms[0];
                 promMin += horaApi[1] - hms[1];
                 promSeg += horaApi[2] - hms[2];
+            });
+            PromesaActual.catch(rechazar => {
+                console.log('Error al conectar a la ip: ' + elemento);
             });
         });
         promHora = promHora / servers.length;
