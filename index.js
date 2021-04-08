@@ -90,10 +90,8 @@ function promedio(horaApi){
 /**
  * Obtiene primero los datos de la hora actual y luego
  * llama al metodo berkely
- * @param {*} ip 
- * @param {*} puerto 
  */
-function obtenerHoraApi(ip , puerto){
+function obtenerHoraApi(){
     var promesa = new Promise((resolver, rechazar) => {
         console.log('Inicial');
         fetch('http://worldtimeapi.org/api/timezone/America/Bogota')
@@ -157,7 +155,6 @@ function enviarHoraPorIP(ip , puerto , path, hora){
     });
 }
   
-
 app.get('/', (req, res) => res.send('Hello World!'));
 
 server.listen(port, () => {
