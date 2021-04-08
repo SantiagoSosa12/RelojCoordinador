@@ -82,14 +82,14 @@ function promedio(horaApi) {
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
 
-function promedioAllServers(promHora, promMin, promSeg, horaApi) {
+function promedioAllServers(promHora, promMin, promSeg) {
     for(let i =0 , p = Promise.resolve(); i < servers.length; i++){
         p = enviarHoraPorIP(servers[i], 3001, '/sincronizar', horaApi);
         p.then(result => {
             hms = result.split(':');
-            promHora += horaApi[0] - hms[0];
-            promMin += horaApi[1] - hms[1];
-            promSeg += horaApi[2] - hms[2];
+            promHora += horaApi[0];
+            promMin += horaApi[1];
+            promSeg += horaApi[2];
             console.log('Promedio actual: ' + promHora + ':' + promMin + ':' + promSeg);
         });
         p.catch(rechazar => {
