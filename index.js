@@ -75,9 +75,9 @@ function promedio(horaApi) {
     var horaAc = fecha.getHours();
     var minutosAc = fecha.getMinutes();
     var segAc = fecha.getSeconds();
-    var promHora = horaApi[0] - horaAc;
-    var promMin = horaApi[1] - minutosAc;
-    var promSeg = horaApi[2] - segAc;
+    var promHora = new Number(horaApi[0] - horaAc);
+    var promMin = new Number(horaApi[1] - minutosAc);
+    var promSeg = new Number(horaApi[2] - segAc);
     var promedioOtrosServidores = promedioAllServers(promHora, promMin, promSeg, horaApi);
     console.log("Promedio de desfase de hora: " + promedioOtrosServidores);
 }
